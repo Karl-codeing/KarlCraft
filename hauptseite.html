@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mein Shop – Hauptseite</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #0046be;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #0073e6;
+      color: white;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Willkommen in deinem Shop, Mein Lord!</h1>
+<button id="logoutBtn">Logout</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
+    authDomain: "github-site-a4366.firebaseapp.com",
+    projectId: "github-site-a4366",
+    storageBucket: "github-site-a4366.firebasestorage.app",
+    messagingSenderId: "928253879225",
+    appId: "1:928253879225:web:822f4f14079a9de2facc68",
+    measurementId: "G-XNPYTECHDG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      window.location.href = "index.html"; // zurück zum Login, wenn ausgeloggt
+    }
+  });
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => {
+      window.location.href = "index.html";
+    });
+  });
+</script>
+
+</body>
+</html>
