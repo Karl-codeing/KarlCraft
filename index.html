@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login - Mein Shop</title>
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0046be, #0088ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .login-container {
+    background: white;
+    padding: 2.5rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    width: 350px;
+    max-width: 90vw;
+  }
+  .login-container h2 {
+    margin-bottom: 1.5rem;
+    color: #111;
+    font-weight: 600;
+  }
+  .login-container label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .login-container input[type="text"],
+  .login-container input[type="email"],
+  .login-container input[type="password"] {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  .login-container input[type="text"]:focus,
+  .login-container input[type="email"]:focus,
+  .login-container input[type="password"]:focus {
+    outline: none;
+    border-color: #0073e6;
+    box-shadow: 0 0 5px #0073e6;
+  }
+  .login-container button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #0073e6;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .login-container button:hover {
+    background-color: #005bb5;
+  }
+  .login-footer {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+    color: #666;
+  }
+  .login-footer a {
+    color: #0073e6;
+    text-decoration: none;
+  }
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Login bei Mein Shop</h2>
+  <form id="loginForm" autocomplete="off">
+    <label for="email">E-Mail-Adresse</label>
+    <input type="email" id="email" placeholder="Email eingeben" required />
+
+    <label for="password">Passwort</label>
+    <input type="password" id="password" placeholder="Passwort" required />
+
+    <button type="submit">Einloggen</button>
+  </form>
+  <div class="login-footer">
+    Noch keinen Account? <a href="#" id="showRegister">Registrieren</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('Login-Funktion noch nicht implementiert.');
+  });
+
+  document.getElementById('showRegister').addEventListener('click', e => {
+    e.preventDefault();
+    alert('Registrierungsseite noch nicht implementiert.');
+  });
+</script>
+
+</body>
+</html>
