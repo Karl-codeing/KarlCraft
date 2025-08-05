@@ -5,639 +5,352 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Shop Ziegler</title>
   <style>
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0046be, #0088ff);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    * {
+      box-sizing: border-box;
     }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0046be, #0073e6);
+      color: #fff;
+    }
+
     header {
-      width: 100%;
-      max-width: 1200px;
-      padding: 1rem 2rem;
-      font-size: 2rem;
-      font-weight: bold;
-      letter-spacing: 1.5px;
-      user-select: none;
-      margin-top: 1rem;
-      text-shadow: 0 0 8px rgba(0,0,0,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
+      padding: 1rem 2rem;
+      background-color: rgba(0, 0, 0, 0.2);
     }
-    /* Zahnrad und Dropdown */
-    #settingsBtn {
-      font-size: 1.8rem;
-      cursor: pointer;
-      user-select: none;
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    #controls {
+      display: flex;
+      gap: 1rem;
+    }
+
+    input[type="text"], select {
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    #logoutBtn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background-color: #e63946;
       color: white;
-      transition: color 0.3s ease;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #logoutBtn:hover {
+      background-color: #b22222;
+    }
+
+    #settingsMenu {
       position: relative;
+      display: inline-block;
     }
-    #settingsBtn:hover {
-      color: #00d2ff;
+
+    #settingsIcon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: white;
     }
+
     #dropdownMenu {
       display: none;
       position: absolute;
       right: 0;
-      top: 3rem;
-      background: rgba(0,0,0,0.8);
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-      min-width: 180px;
-      z-index: 2000;
-      flex-direction: column;
-      user-select: none;
-    }
-    #dropdownMenu.active {
-      display: flex;
-    }
-    #dropdownMenu button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 0.8rem 1.2rem;
-      font-size: 1rem;
-      text-align: left;
-      cursor: pointer;
-      transition: background-color 0.25s;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    #dropdownMenu button:last-child {
-      border-bottom: none;
-    }
-    #dropdownMenu button:hover {
-      background-color: #005bb5;
+      background-color: white;
+      color: black;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      border-radius: 6px;
+      z-index: 1000;
     }
 
-    .container {
-      width: 90vw;
-      max-width: 1200px;
-      margin-top: 1.5rem;
-      background: rgba(255 255 255 / 0.1);
-      border-radius: 10px;
-      padding: 1rem 2rem 2rem 2rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      display: flex;
-      gap: 1rem;
-      min-height: 70vh;
-    }
-    .filter {
-      width: 200px;
-      background: rgba(0,0,0,0.15);
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: inset 0 0 8px rgba(255 255 255 / 0.2);
-      user-select: none;
-    }
-    .filter h3 {
-      margin-top: 0;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(0,0,0,0.7);
-    }
-    .filter label {
+    #dropdownMenu a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
       display: block;
-      margin: 0.5rem 0;
-      cursor: pointer;
-      transition: color 0.25s ease;
-    }
-    .filter input[type="radio"] {
-      margin-right: 0.5rem;
-      cursor: pointer;
-    }
-    .filter label:hover {
-      color: #00d2ff;
-    }
-    .main {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .search-bar {
-      margin-bottom: 1rem;
-      text-align: right;
-    }
-    .search-bar input {
-      width: 300px;
-      max-width: 100%;
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      border: none;
-      font-size: 1rem;
-      box-shadow: 0 0 8px rgba(255 255 255 / 0.5);
-      transition: box-shadow 0.3s ease;
-    }
-    .search-bar input:focus {
-      outline: none;
-      box-shadow: 0 0 12px #00d2ff;
-      background: rgba(255 255 255 / 0.9);
-      color: #000;
-    }
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-      gap: 1rem;
-      overflow-y: auto;
-    }
-    .product {
-      background: rgba(255 255 255 / 0.2);
-      border-radius: 10px;
-      padding: 1rem;
-      text-align: center;
-      box-shadow: 0 0 8px rgba(0,0,0,0.25);
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .product:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 0 20px #00d2ff;
-    }
-    .product img {
-      max-width: 100%;
-      height: 140px;
-      object-fit: contain;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      background: white;
-      padding: 0.5rem;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
-    }
-    .product .name {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: white;
-      text-shadow: 0 0 5px rgba(0,0,0,0.8);
-    }
-    .product .price {
-      font-weight: 700;
-      color: #00d2ff;
-      font-size: 1.1rem;
-      margin-top: auto;
     }
 
-    /* Modal Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+    #dropdownMenu a:hover {
+      background-color: #f1f1f1;
+    }
+
+    #settingsMenu:hover #dropdownMenu {
+      display: block;
+    }
+
+    main {
+      padding: 2rem;
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .product {
+      background-color: white;
+      color: black;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+
+    .product:hover {
+      transform: scale(1.03);
+    }
+
+    .product img {
+      width: 100%;
+      border-radius: 6px;
+    }
+
+    .modal {
       display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-      animation: fadeIn 0.3s ease forwards;
-    }
-    .modal-overlay.active {
-      display: flex;
+      z-index: 9999;
     }
 
-    /* Modal Content */
     .modal-content {
-      background: #0046be;
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 800px;
-      width: 90vw;
-      color: white;
-      box-shadow: 0 0 20px #0088ff;
-      display: flex;
-      gap: 1rem;
-      animation: slideIn 0.3s ease forwards;
-      position: relative;
-    }
-    /* Bilderbereich */
-    .modal-images {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .modal-images img {
-      width: 100%;
-      border-radius: 10px;
-      object-fit: contain;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      transition: transform 0.25s ease;
-    }
-    .modal-images img:hover {
-      transform: scale(1.05);
-    }
-    /* Produktdetails */
-    .modal-details {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .modal-details h2 {
-      margin: 0 0 1rem 0;
-      font-weight: 700;
-      text-shadow: 0 0 10px rgba(0,0,0,0.7);
-    }
-    .modal-details p.description {
-      flex-grow: 1;
-      font-size: 1rem;
-      line-height: 1.4;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 5px rgba(0,0,0,0.6);
-    }
-    .modal-details .price {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #00d2ff;
-      margin-bottom: 1rem;
-    }
-    /* Buttons */
-    .modal-details button {
-      padding: 0.7rem 1.2rem;
-      border: none;
+      background: white;
+      color: black;
+      padding: 2rem;
       border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
+      max-width: 600px;
+      width: 90%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .modal-content img {
+      width: 45%;
+      margin: 0.5rem;
+      border-radius: 6px;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .modal-content button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
       margin-right: 1rem;
-      transition: background-color 0.3s;
-    }
-    .add-cart {
-      background-color: #005bb5;
-      color: white;
-      box-shadow: 0 0 8px #004a99;
-    }
-    .add-cart:hover {
-      background-color: #003f7f;
-    }
-    .buy-now {
-      background-color: #00d2ff;
-      color: #00446b;
-      box-shadow: 0 0 8px #00a6ff;
-    }
-    .buy-now:hover {
-      background-color: #0089cc;
-      color: white;
-    }
-
-    /* Close Button */
-    .modal-close {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 2rem;
-      font-weight: bold;
-      color: white;
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.3s;
-      z-index: 1010;
-    }
-    .modal-close:hover {
-      color: #00d2ff;
-    }
-
-    /* Warenkorb Modal - eigene Scrollbox für Items */
-    .cart-items {
-      max-height: 300px;
-      overflow-y: auto;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      background: rgba(255 255 255 / 0.1);
-      padding: 0.8rem;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
-    }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.7rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-    }
-    .cart-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    .cart-item-name {
-      font-weight: 600;
-    }
-    .cart-item-qty {
-      margin-left: 0.5rem;
-      font-weight: 500;
-      color: #00d2ff;
-    }
-    .cart-item-price {
-      font-weight: 700;
-      color: #00d2ff;
-    }
-    .cart-total {
-      font-size: 1.3rem;
-      font-weight: 700;
-      text-align: right;
-      margin-bottom: 1rem;
-      color: #00d2ff;
-    }
-    .cart-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-    }
-    .cart-buttons button {
-      padding: 0.7rem 1.4rem;
-      border-radius: 8px;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: 700;
-      font-size: 1rem;
-      transition: background-color 0.3s;
+      font-weight: bold;
     }
-    .btn-back {
-      background-color: #005bb5;
+
+    .close-btn {
+      background-color: #aaa;
       color: white;
-      box-shadow: 0 0 8px #004a99;
     }
-    .btn-back:hover {
-      background-color: #003f7f;
+
+    .buy-btn {
+      background-color: #28a745;
+      color: white;
     }
-    .btn-checkout {
-      background-color: #00d2ff;
-      color: #00446b;
-      box-shadow: 0 0 8px #00a6ff;
-    }
-    .btn-checkout:hover {
-      background-color: #0089cc;
+
+    .cart-btn {
+      background-color: #0073e6;
       color: white;
     }
 
     @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
     }
-    @keyframes slideIn {
-      from {transform: translateY(40px); opacity: 0;}
-      to {transform: translateY(0); opacity: 1;}
-    }
-
   </style>
 </head>
 <body>
+
   <header>
-    Shop Ziegler
-    <div id="settingsBtn" title="Einstellungen">&#9881;</div>
-    <div id="dropdownMenu" role="menu" aria-hidden="true">
-      <button id="profileBtn">Profil</button>
-      <button id="cartBtn">Warenkorb</button>
-    </div>
-  </header>
+    <h1>Shop Ziegler</h1>
+    <div id="controls">
+      <input type="text" id="searchInput" placeholder="Suche nach Produkten..." />
+      <select id="filterSelect">
+        <option value="">Alle Preise</option>
+        <option value="50">Unter 50€</option>
+        <option value="100">Unter 100€</option>
+      </select>
+      <button id="logoutBtn">Logout</button>
 
-  <div class="container">
-    <div class="filter">
-      <h3>Filter</h3>
-      <label><input type="radio" name="category" value="alle" checked> Alle</label>
-      <label><input type="radio" name="category" value="laptop"> Laptops</label>
-      <label><input type="radio" name="category" value="smartphone"> Smartphones</label>
-      <label><input type="radio" name="category" value="tablet"> Tablets</label>
-    </div>
-
-    <main class="main">
-      <div class="search-bar">
-        <input id="searchInput" type="text" placeholder="Suche Produkte..." />
-      </div>
-      <div id="productGrid" class="product-grid">
-        <!-- Produkte per JS rein -->
-      </div>
-    </main>
-  </div>
-
-  <!-- Produkt Detail Modal -->
-  <div id="productModal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <div class="modal-close" id="closeProductModal" title="Schließen">&times;</div>
-      <div class="modal-images" id="modalImages">
-        <!-- Zwei Bilder per JS -->
-      </div>
-      <div class="modal-details">
-        <h2 id="modalProductName"></h2>
-        <p class="description" id="modalProductDescription"></p>
-        <div class="price" id="modalProductPrice"></div>
-        <div>
-          <button class="add-cart" id="addToCartBtn">Zum Warenkorb hinzufügen</button>
-          <button class="buy-now" id="buyNowBtn">Kaufen</button>
+      <div id="settingsMenu">
+        <button id="settingsIcon">⚙️</button>
+        <div id="dropdownMenu">
+          <a href="profile.html">Profil</a>
+          <a href="settings.html">Einstellungen</a>
+          <a href="warenkorb.html">Warenkorb</a>
         </div>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Warenkorb Modal -->
-  <div id="cartModal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content" style="flex-direction: column; max-width: 400px;">
-      <div class="modal-close" id="closeCartModal" title="Schließen">&times;</div>
-      <h2>Warenkorb</h2>
-      <div class="cart-items" id="cartItems">
-        <!-- Warenkorb-Items rein -->
+  <main id="productList"></main>
+
+  <!-- Produkt-Detail-Modale -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalName"></h2>
+      <div>
+        <img id="modalImg1" src="" />
+        <img id="modalImg2" src="" />
       </div>
-      <div class="cart-total" id="cartTotal">Gesamt: 0,00 €</div>
-      <div class="cart-buttons">
-        <button class="btn-back" id="closeCartBtn">Zurück</button>
-        <button class="btn-checkout" id="checkoutBtn">Zur Kasse</button>
-      </div>
+      <p id="modalDesc"></p>
+      <p><strong>Preis:</strong> <span id="modalPrice"></span> €</p>
+      <button class="cart-btn">Zum Warenkorb hinzufügen</button>
+      <button class="buy-btn">Kaufen</button>
+      <button class="close-btn" onclick="closeModal()">Schließen</button>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
+      authDomain: "github-site-a4366.firebaseapp.com",
+      projectId: "github-site-a4366",
+      storageBucket: "github-site-a4366.firebasestorage.app",
+      messagingSenderId: "928253879225",
+      appId: "1:928253879225:web:822f4f14079a9de2facc68",
+      measurementId: "G-XNPYTECHDG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Auth check
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    });
+
+    // Produkte
     const products = [
       {
-        id: 1,
-        name: "Laptop X100",
-        price: 999.99,
-        category: "laptop",
-        description: "Schneller Laptop mit 16 GB RAM und 512 GB SSD.",
-        images: ["https://via.placeholder.com/400x300?text=Laptop+1", "https://via.placeholder.com/400x300?text=Laptop+1+Side"]
+        name: "Smartphone ZX1",
+        price: 299,
+        images: [
+          "https://via.placeholder.com/300x200?text=Smartphone+Vorne",
+          "https://via.placeholder.com/300x200?text=Smartphone+Hinten"
+        ],
+        description: "Ein modernes Smartphone mit allen Funktionen, die du brauchst."
       },
       {
-        id: 2,
-        name: "Smartphone Pro",
-        price: 799.99,
-        category: "smartphone",
-        description: "Top Smartphone mit hervorragender Kamera.",
-        images: ["https://via.placeholder.com/400x300?text=Smartphone+1", "https://via.placeholder.com/400x300?text=Smartphone+1+Back"]
+        name: "Bluetooth Lautsprecher",
+        price: 45,
+        images: [
+          "https://via.placeholder.com/300x200?text=Lautsprecher+Vorne",
+          "https://via.placeholder.com/300x200?text=Lautsprecher+Oben"
+        ],
+        description: "Tragbarer Lautsprecher mit starkem Sound und Bass."
       },
       {
-        id: 3,
-        name: "Tablet S10",
-        price: 499.99,
-        category: "tablet",
-        description: "Leichtes Tablet mit tollem Display.",
-        images: ["https://via.placeholder.com/400x300?text=Tablet+1", "https://via.placeholder.com/400x300?text=Tablet+1+Back"]
+        name: "Gaming-Maus GX500",
+        price: 39.99,
+        images: [
+          "https://via.placeholder.com/300x200?text=Gaming+Maus",
+          "https://via.placeholder.com/300x200?text=Maus+RGB"
+        ],
+        description: "Präzise Maus mit RGB-Beleuchtung für Gamer."
       },
-      // mehr Produkte hier ...
+      {
+        name: "Laptop STX15",
+        price: 999,
+        images: [
+          "https://via.placeholder.com/300x200?text=Laptop+Vorne",
+          "https://via.placeholder.com/300x200?text=Laptop+Hinten"
+        ],
+        description: "Leistungsstarker Laptop für Arbeit und Spiele."
+      },
+      {
+        name: "Fitness Tracker",
+        price: 29,
+        images: [
+          "https://via.placeholder.com/300x200?text=Tracker+Display",
+          "https://via.placeholder.com/300x200?text=Tracker+Armband"
+        ],
+        description: "Verfolge Schritte, Schlaf und Herzfrequenz."
+      }
     ];
 
-    let cart = [];
-
-    // Elemente
-    const productGrid = document.getElementById("productGrid");
+    const productList = document.getElementById("productList");
     const searchInput = document.getElementById("searchInput");
-    const categoryRadios = document.querySelectorAll('input[name="category"]');
+    const filterSelect = document.getElementById("filterSelect");
 
-    const settingsBtn = document.getElementById("settingsBtn");
-    const dropdownMenu = document.getElementById("dropdownMenu");
-    const profileBtn = document.getElementById("profileBtn");
-    const cartBtn = document.getElementById("cartBtn");
-
-    const productModal = document.getElementById("productModal");
-    const closeProductModal = document.getElementById("closeProductModal");
-    const modalImages = document.getElementById("modalImages");
-    const modalProductName = document.getElementById("modalProductName");
-    const modalProductDescription = document.getElementById("modalProductDescription");
-    const modalProductPrice = document.getElementById("modalProductPrice");
-    const addToCartBtn = document.getElementById("addToCartBtn");
-    const buyNowBtn = document.getElementById("buyNowBtn");
-
-    const cartModal = document.getElementById("cartModal");
-    const closeCartModal = document.getElementById("closeCartModal");
-    const cartItemsEl = document.getElementById("cartItems");
-    const cartTotalEl = document.getElementById("cartTotal");
-    const closeCartBtn = document.getElementById("closeCartBtn");
-    const checkoutBtn = document.getElementById("checkoutBtn");
-
-    // Dropdown Toggle
-    settingsBtn.addEventListener("click", () => {
-      dropdownMenu.classList.toggle("active");
-    });
-
-    // Klick außerhalb Dropdown schließt das Menü
-    document.addEventListener("click", e => {
-      if (!settingsBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.classList.remove("active");
-      }
-    });
-
-    // Filter und Suche
-    function filterAndSearchProducts() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const selectedCategory = document.querySelector('input[name="category"]:checked').value;
-
-      return products.filter(p => {
-        const matchCategory = selectedCategory === "alle" || p.category === selectedCategory;
-        const matchSearch = p.name.toLowerCase().includes(searchTerm);
-        return matchCategory && matchSearch;
-      });
-    }
-
-    // Produkte anzeigen
-    function renderProducts() {
-      const filteredProducts = filterAndSearchProducts();
-      productGrid.innerHTML = "";
-
-      filteredProducts.forEach(p => {
+    function renderProducts(filteredProducts) {
+      productList.innerHTML = "";
+      filteredProducts.forEach((product, index) => {
         const div = document.createElement("div");
         div.className = "product";
-        div.setAttribute("data-id", p.id);
         div.innerHTML = `
-          <img src="${p.images[0]}" alt="${p.name}" />
-          <div class="name">${p.name}</div>
-          <div class="price">${p.price.toFixed(2)} €</div>
+          <img src="${product.images[0]}" alt="${product.name}" />
+          <h3>${product.name}</h3>
+          <p>${product.price.toFixed(2)} €</p>
         `;
-        div.addEventListener("click", () => openProductModal(p.id));
-        productGrid.appendChild(div);
+        div.addEventListener("click", () => showProductModal(product));
+        productList.appendChild(div);
       });
-
-      if (filteredProducts.length === 0) {
-        productGrid.innerHTML = "<p style='color: #ccc; text-align:center;'>Keine Produkte gefunden.</p>";
-      }
     }
 
-    // Produktmodal öffnen
-    function openProductModal(productId) {
-      const product = products.find(p => p.id === productId);
-      if (!product) return;
-
-      modalImages.innerHTML = product.images.map(src => `<img src="${src}" alt="${product.name}" />`).join("");
-      modalProductName.textContent = product.name;
-      modalProductDescription.textContent = product.description;
-      modalProductPrice.textContent = product.price.toFixed(2) + " €";
-
-      // Button Event Listener
-      addToCartBtn.onclick = () => addToCart(productId);
-      buyNowBtn.onclick = () => alert(`Kaufen noch nicht implementiert: ${product.name}`);
-
-      productModal.classList.add("active");
-      productModal.setAttribute("aria-hidden", "false");
-      dropdownMenu.classList.remove("active");
-    }
-    closeProductModal.addEventListener("click", () => {
-      productModal.classList.remove("active");
-      productModal.setAttribute("aria-hidden", "true");
-    });
-
-    // Warenkorbfunktionen
-    function addToCart(productId) {
-      const existing = cart.find(item => item.id === productId);
-      if (existing) {
-        existing.qty++;
-      } else {
-        cart.push({id: productId, qty: 1});
-      }
-      alert("Produkt zum Warenkorb hinzugefügt.");
-      productModal.classList.remove("active");
-      renderCart();
+    function showProductModal(product) {
+      document.getElementById("modalName").textContent = product.name;
+      document.getElementById("modalImg1").src = product.images[0];
+      document.getElementById("modalImg2").src = product.images[1];
+      document.getElementById("modalDesc").textContent = product.description;
+      document.getElementById("modalPrice").textContent = product.price.toFixed(2);
+      document.getElementById("productModal").style.display = "flex";
     }
 
-    function renderCart() {
-      cartItemsEl.innerHTML = "";
-      let total = 0;
+    window.closeModal = function () {
+      document.getElementById("productModal").style.display = "none";
+    };
 
-      if (cart.length === 0) {
-        cartItemsEl.innerHTML = "<p>Warenkorb ist leer.</p>";
-      } else {
-        cart.forEach(item => {
-          const product = products.find(p => p.id === item.id);
-          if (!product) return;
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase();
+      const maxPrice = parseFloat(filterSelect.value) || Infinity;
 
-          const div = document.createElement("div");
-          div.className = "cart-item";
-          div.innerHTML = `
-            <div><span class="cart-item-name">${product.name}</span> <span class="cart-item-qty">x${item.qty}</span></div>
-            <div class="cart-item-price">${(product.price * item.qty).toFixed(2)} €</div>
-          `;
-          cartItemsEl.appendChild(div);
-          total += product.price * item.qty;
-        });
-      }
-      cartTotalEl.textContent = "Gesamt: " + total.toFixed(2) + " €";
-      cartModal.classList.add("active");
-      cartModal.setAttribute("aria-hidden", "false");
+      const filtered = products.filter(p =>
+        p.name.toLowerCase().includes(query) && p.price <= maxPrice
+      );
+      renderProducts(filtered);
     }
 
-    closeCartModal.addEventListener("click", () => {
-      cartModal.classList.remove("active");
-      cartModal.setAttribute("aria-hidden", "true");
-    });
-    closeCartBtn.addEventListener("click", () => {
-      cartModal.classList.remove("active");
-      cartModal.setAttribute("aria-hidden", "true");
-    });
+    searchInput.addEventListener("input", applyFilters);
+    filterSelect.addEventListener("change", applyFilters);
 
-    // Dropdown Warenkorb Button
-    cartBtn.addEventListener("click", () => {
-      dropdownMenu.classList.remove("active");
-      renderCart();
-    });
-
-    // Filter & Suche Events
-    searchInput.addEventListener("input", renderProducts);
-    categoryRadios.forEach(radio => radio.addEventListener("change", renderProducts));
-
-    renderProducts();
-
+    renderProducts(products);
   </script>
+
 </body>
 </html>
