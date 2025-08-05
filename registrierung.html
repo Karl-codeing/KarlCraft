@@ -1,78 +1,105 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Registrierung - Mein Shop</title>
-  <style>
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0046be, #0088ff);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .register-container {
-      background: white;
-      padding: 2.5rem 3rem;
-      border-radius: 8px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      width: 350px;
-      max-width: 90vw;
-    }
-    .register-container h2 {
-      margin-bottom: 1.5rem;
-      color: #111;
-      font-weight: 600;
-    }
-    .register-container input[type="email"],
-    .register-container input[type="password"] {
-      width: 100%;
-      padding: 0.6rem 0.8rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    .register-container input[type="email"]:focus,
-    .register-container input[type="password"]:focus {
-      outline: none;
-      border-color: #0073e6;
-      box-shadow: 0 0 5px #0073e6;
-    }
-    .register-container button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #0073e6;
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .register-container button:hover {
-      background-color: #005bb5;
-    }
-    #message {
-      margin-top: 1rem;
-      color: red;
-      font-weight: 600;
-      min-height: 1.5em;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registrieren - Mein Shop</title>
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0046be, #0088ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .register-container {
+    background: white;
+    padding: 2.5rem 3rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    width: 350px;
+    max-width: 90vw;
+  }
+  .register-container h2 {
+    margin-bottom: 1.5rem;
+    color: #111;
+    font-weight: 600;
+  }
+  .register-container label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .register-container input[type="email"],
+  .register-container input[type="password"] {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  .register-container input[type="email"]:focus,
+  .register-container input[type="password"]:focus {
+    outline: none;
+    border-color: #0073e6;
+    box-shadow: 0 0 5px #0073e6;
+  }
+  .register-container button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #0073e6;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .register-container button:hover {
+    background-color: #005bb5;
+  }
+  .register-footer {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    text-align: center;
+    color: #666;
+  }
+  .register-footer a {
+    color: #0073e6;
+    text-decoration: none;
+  }
+  .register-footer a:hover {
+    text-decoration: underline;
+  }
+  #message {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    height: 1.2rem;
+  }
+</style>
 </head>
 <body>
 
 <div class="register-container">
-  <h2>Registrieren</h2>
-  <input id="email" type="email" placeholder="E-Mail" />
-  <input id="password" type="password" placeholder="Passwort" />
-  <button id="registerBtn">Registrieren</button>
+  <h2>Registrieren bei Mein Shop</h2>
   <p id="message"></p>
+  <form id="registerForm" autocomplete="off">
+    <label for="email">E-Mail-Adresse</label>
+    <input type="email" id="email" placeholder="Email eingeben" required />
+
+    <label for="password">Passwort</label>
+    <input type="password" id="password" placeholder="Passwort" required />
+
+    <button type="submit">Registrieren</button>
+  </form>
+  <div class="register-footer">
+    Schon einen Account? <a href="index.html">Login</a>
+  </div>
 </div>
 
 <script type="module">
@@ -91,26 +118,20 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const messageP = document.getElementById("message");
 
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const registerBtn = document.getElementById('registerBtn');
-  const messageP = document.getElementById('message');
-
-  registerBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) {
-      messageP.style.color = 'red';
-      messageP.textContent = "E-Mail und Passwort dürfen nicht leer sein.";
-      return;
-    }
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
     createUserWithEmailAndPassword(auth, email, password)
       .then(() => {
         messageP.style.color = 'green';
         messageP.textContent = "Registrierung erfolgreich!";
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
       })
       .catch(error => {
         messageP.style.color = 'red';
