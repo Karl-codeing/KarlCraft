@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registrierung - Mein Shop</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0046be, #0088ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .register-container {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      width: 350px;
+      max-width: 90vw;
+    }
+    .register-container h2 {
+      margin-bottom: 1.5rem;
+      color: #111;
+      font-weight: 600;
+    }
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    .register-container input[type="email"]:focus,
+    .register-container input[type="password"]:focus {
+      outline: none;
+      border-color: #0073e6;
+      box-shadow: 0 0 5px #0073e6;
+    }
+    .register-container button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #0073e6;
+      border: none;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .register-container button:hover {
+      background-color: #005bb5;
+    }
+    #message {
+      margin-top: 1rem;
+      color: red;
+      font-weight: 600;
+      min-height: 1.5em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="register-container">
+  <h2>Registrieren</h2>
+  <input id="email" type="email" placeholder="E-Mail" />
+  <input id="password" type="password" placeholder="Passwort" />
+  <button id="registerBtn">Registrieren</button>
+  <p id="message"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
+    authDomain: "github-site-a4366.firebaseapp.com",
+    projectId: "github-site-a4366",
+    storageBucket: "github-site-a4366.firebasestorage.app",
+    messagingSenderId: "928253879225",
+    appId: "1:928253879225:web:822f4f14079a9de2facc68",
+    measurementId: "G-XNPYTECHDG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const registerBtn = document.getElementById('registerBtn');
+  const messageP = document.getElementById('message');
+
+  registerBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      messageP.textContent = "E-Mail und Passwort dürfen nicht leer sein.";
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        messageP.style.color = 'green';
+        messageP.textContent = "Registrierung erfolgreich!";
+      })
+      .catch(error => {
+        messageP.style.color = 'red';
+        messageP.textContent = "Fehler: " + error.message;
+      });
+  });
+</script>
+
+</body>
+</html>
 
