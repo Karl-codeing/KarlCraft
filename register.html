@@ -1,0 +1,26 @@
+<form id="registerForm">
+  <input type="text" id="regUsername" placeholder="Benutzername" required />
+  <input type="email" id="regEmail" placeholder="E-Mail" required />
+  <input type="password" id="regPassword" placeholder="Passwort" required />
+  <input type="password" id="regPasswordConfirm" placeholder="Passwort bestätigen" required />
+  <button type="submit">Registrieren</button>
+</form>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+    if (password !== passwordConfirm) {
+      alert('Passwörter stimmen nicht überein!');
+      return;
+    }
+    // Beispiel: Daten lokal speichern (NICHT sicher!)
+    localStorage.setItem('user', JSON.stringify({ username, email, password }));
+    alert('Registrierung erfolgreich!');
+    // Hier z.B. Weiterleitung oder Login anzeigen
+  });
+</script>
