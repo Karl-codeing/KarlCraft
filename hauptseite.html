@@ -1,251 +1,235 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mein Shop - Hauptseite</title>
-<style>
-  /* Einfacher blauer Verlauf als Hintergrund */
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0046be, #0088ff);
-    color: #fff;
-  }
-  header {
-    position: relative;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    background: rgba(0,0,0,0.2);
-  }
-  /* Zahnrad Icon */
-  .settings {
-    position: relative;
-    cursor: pointer;
-    width: 30px;
-    height: 30px;
-    background: url('https://cdn-icons-png.flaticon.com/512/2099/2099058.png') no-repeat center/contain;
-  }
-  /* Dropdown Menü */
-  .dropdown {
-    position: absolute;
-    top: 45px;
-    right: 0;
-    background: rgba(0,0,0,0.8);
-    border-radius: 8px;
-    overflow: hidden;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    width: 160px;
-  }
-  .dropdown.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-  }
-  .dropdown a {
-    display: block;
-    padding: 0.8rem 1rem;
-    color: #fff;
-    text-decoration: none;
-    border-bottom: 1px solid #0066ff;
-  }
-  .dropdown a:last-child {
-    border-bottom: none;
-  }
-  .dropdown a:hover {
-    background: #0066ff;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop Ziegler</title>
+  <style>
+    /* Grundstil & Farbverlauf */
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0046be, #0088ff);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      padding: 1rem 2rem;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      user-select: none;
+      margin-top: 1rem;
+      text-shadow: 0 0 8px rgba(0,0,0,0.3);
+    }
 
-  main {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  h1 {
-    margin-bottom: 2rem;
-  }
+    /* Container */
+    .container {
+      width: 90vw;
+      max-width: 1200px;
+      margin-top: 1.5rem;
+      background: rgba(255 255 255 / 0.1);
+      border-radius: 10px;
+      padding: 1rem 2rem 2rem 2rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      display: flex;
+      gap: 1rem;
+      min-height: 70vh;
+    }
 
-  /* Einfaches Produkt-Gitter */
-  .products {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-    gap: 1.5rem;
-  }
-  .product {
-    background: rgba(255 255 255 / 0.15);
-    border-radius: 8px;
-    padding: 1rem;
-    transition: background 0.3s ease;
-    cursor: pointer;
-  }
-  .product:hover {
-    background: rgba(255 255 255 / 0.3);
-  }
-  .product img {
-    width: 100%;
-    border-radius: 6px;
-  }
-  .product h3 {
-    margin: 0.5rem 0 0.3rem;
-  }
-  .product p {
-    font-size: 0.9rem;
-    margin: 0.2rem 0 0.8rem;
-  }
-  .product .price {
-    font-weight: bold;
-  }
+    /* Filter Sidebar */
+    .filter {
+      width: 200px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: inset 0 0 8px rgba(255 255 255 / 0.2);
+      user-select: none;
+    }
+    .filter h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+    .filter label {
+      display: block;
+      margin: 0.5rem 0;
+      cursor: pointer;
+      transition: color 0.25s ease;
+    }
+    .filter input[type="radio"] {
+      margin-right: 0.5rem;
+      cursor: pointer;
+    }
+    .filter label:hover {
+      color: #00d2ff;
+    }
 
-  /* Profil mit Hover Passwort */
-  .profile-info {
-    padding: 1rem;
-    background: rgba(0,0,0,0.5);
-    border-radius: 8px;
-    color: #ccc;
-    margin-top: 1rem;
-  }
-  .password {
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-  }
-  .password span {
-    filter: blur(4px);
-    transition: filter 0.3s ease;
-  }
-  .password:hover span {
-    filter: none;
-  }
-</style>
+    /* Hauptbereich */
+    .main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Suchleiste */
+    .search-bar {
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+    .search-bar input {
+      width: 300px;
+      max-width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      border: none;
+      font-size: 1rem;
+      box-shadow: 0 0 8px rgba(255 255 255 / 0.5);
+      transition: box-shadow 0.3s ease;
+    }
+    .search-bar input:focus {
+      outline: none;
+      box-shadow: 0 0 12px #00d2ff;
+      background: rgba(255 255 255 / 0.9);
+      color: #000;
+    }
+
+    /* Produkt Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap: 1rem;
+      overflow-y: auto;
+    }
+
+    /* Einzelprodukt */
+    .product {
+      background: rgba(255 255 255 / 0.2);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 20px #00d2ff;
+    }
+    .product img {
+      max-width: 100%;
+      height: 140px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      background: white;
+      padding: 0.5rem;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+    }
+    .product .name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: white;
+      text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+    .product .price {
+      font-weight: 700;
+      color: #00d2ff;
+      font-size: 1.1rem;
+      margin-top: auto;
+    }
+
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="settings" id="settingsIcon" title="Einstellungen"></div>
-  <div class="dropdown" id="dropdownMenu">
-    <a href="#" id="openSettings">Einstellungen</a>
-    <a href="#" id="openProfile">Profil</a>
-    <a href="#" id="logoutBtn" style="color:#f66;">Logout</a>
-  </div>
-</header>
+<header>Shop Ziegler</header>
 
-<main>
-  <h1>Willkommen in deinem Shop, <span id="userName">Mein Lord</span>!</h1>
+<div class="container">
+  <aside class="filter">
+    <h3>Filter</h3>
+    <label><input type="radio" name="priceFilter" value="all" checked /> Alle Preise</label>
+    <label><input type="radio" name="priceFilter" value="low" /> Bis 20€</label>
+    <label><input type="radio" name="priceFilter" value="mid" /> 20€ - 50€</label>
+    <label><input type="radio" name="priceFilter" value="high" /> Über 50€</label>
+  </aside>
 
-  <div id="content">
-    <div class="products" id="productList">
-      <!-- Produkte werden hier eingefügt -->
+  <main class="main">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Suche Produkte..." />
     </div>
-  </div>
-
-  <div id="profileSection" style="display:none;">
-    <h2>Profil</h2>
-    <div class="profile-info">
-      <p><strong>E-Mail:</strong> <span id="userEmail"></span></p>
-      <p><strong>Passwort:</strong> <span class="password"><span>********</span></span> (hover zum Anzeigen)</p>
+    <div class="product-grid" id="productGrid">
+      <!-- Produkte werden dynamisch hier reingeladen -->
     </div>
-  </div>
-</main>
+  </main>
+</div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
-    authDomain: "github-site-a4366.firebaseapp.com",
-    projectId: "github-site-a4366",
-    storageBucket: "github-site-a4366.firebasestorage.app",
-    messagingSenderId: "928253879225",
-    appId: "1:928253879225:web:822f4f14079a9de2facc68",
-    measurementId: "G-XNPYTECHDG"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  const settingsIcon = document.getElementById('settingsIcon');
-  const dropdownMenu = document.getElementById('dropdownMenu');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const openSettings = document.getElementById('openSettings');
-  const openProfile = document.getElementById('openProfile');
-  const profileSection = document.getElementById('profileSection');
-  const content = document.getElementById('content');
-  const userNameElem = document.getElementById('userName');
-  const userEmailElem = document.getElementById('userEmail');
-
-  // Produkte - Beispiel-Daten (10 Stück)
+  // Produkte Beispiel-Daten
   const products = [
-    {name:"Produkt 1", desc:"Beschreibung 1", price:"19.99 €", img:"https://via.placeholder.com/220x140?text=1"},
-    {name:"Produkt 2", desc:"Beschreibung 2", price:"29.99 €", img:"https://via.placeholder.com/220x140?text=2"},
-    {name:"Produkt 3", desc:"Beschreibung 3", price:"9.99 €", img:"https://via.placeholder.com/220x140?text=3"},
-    {name:"Produkt 4", desc:"Beschreibung 4", price:"49.99 €", img:"https://via.placeholder.com/220x140?text=4"},
-    {name:"Produkt 5", desc:"Beschreibung 5", price:"15.99 €", img:"https://via.placeholder.com/220x140?text=5"},
-    {name:"Produkt 6", desc:"Beschreibung 6", price:"12.99 €", img:"https://via.placeholder.com/220x140?text=6"},
-    {name:"Produkt 7", desc:"Beschreibung 7", price:"7.99 €", img:"https://via.placeholder.com/220x140?text=7"},
-    {name:"Produkt 8", desc:"Beschreibung 8", price:"24.99 €", img:"https://via.placeholder.com/220x140?text=8"},
-    {name:"Produkt 9", desc:"Beschreibung 9", price:"34.99 €", img:"https://via.placeholder.com/220x140?text=9"},
-    {name:"Produkt 10", desc:"Beschreibung 10", price:"44.99 €", img:"https://via.placeholder.com/220x140?text=10"},
+    { id:1, name: "Kopfhörer", price: 15, img:"https://via.placeholder.com/150?text=Kopfhörer" },
+    { id:2, name: "Gaming Maus", price: 45, img:"https://via.placeholder.com/150?text=Gaming+Maus" },
+    { id:3, name: "Smartphone", price: 299, img:"https://via.placeholder.com/150?text=Smartphone" },
+    { id:4, name: "Laptop", price: 799, img:"https://via.placeholder.com/150?text=Laptop" },
+    { id:5, name: "USB-Stick", price: 9, img:"https://via.placeholder.com/150?text=USB-Stick" },
+    { id:6, name: "Tastatur", price: 29, img:"https://via.placeholder.com/150?text=Tastatur" },
+    { id:7, name: "Monitor", price: 120, img:"https://via.placeholder.com/150?text=Monitor" },
+    { id:8, name: "Externe Festplatte", price: 65, img:"https://via.placeholder.com/150?text=Festplatte" },
+    { id:9, name: "Webcam", price: 50, img:"https://via.placeholder.com/150?text=Webcam" },
+    { id:10,name: "Bluetooth Lautsprecher", price: 35, img:"https://via.placeholder.com/150?text=Lautsprecher" }
   ];
 
-  // Produkte rendern
-  function showProducts() {
-    const container = document.getElementById('productList');
-    container.innerHTML = '';
-    products.forEach(p => {
+  const productGrid = document.getElementById('productGrid');
+  const searchInput = document.getElementById('searchInput');
+  const priceFilters = document.getElementsByName('priceFilter');
+
+  function renderProducts() {
+    const searchText = searchInput.value.toLowerCase();
+    let priceFilter = [...priceFilters].find(f => f.checked).value;
+
+    // Filter Produkte nach Suche & Preis
+    const filtered = products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchText);
+      let matchesPrice = true;
+
+      if(priceFilter === 'low') matchesPrice = p.price <= 20;
+      else if(priceFilter === 'mid') matchesPrice = p.price > 20 && p.price <= 50;
+      else if(priceFilter === 'high') matchesPrice = p.price > 50;
+
+      return matchesSearch && matchesPrice;
+    });
+
+    productGrid.innerHTML = '';
+    if(filtered.length === 0) {
+      productGrid.innerHTML = '<p style="color:#fff; text-align:center; grid-column:1/-1;">Keine Produkte gefunden.</p>';
+      return;
+    }
+
+    filtered.forEach(p => {
       const div = document.createElement('div');
-      div.classList.add('product');
+      div.className = 'product';
       div.innerHTML = `
-        <img src="${p.img}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <p>${p.desc}</p>
-        <p class="price">${p.price}</p>
+        <img src="${p.img}" alt="${p.name}" />
+        <div class="name">${p.name}</div>
+        <div class="price">${p.price}€</div>
       `;
-      container.appendChild(div);
+      productGrid.appendChild(div);
     });
   }
 
-  // Menü toggle
-  settingsIcon.addEventListener('click', () => {
-    dropdownMenu.classList.toggle('show');
-  });
+  searchInput.addEventListener('input', renderProducts);
+  priceFilters.forEach(radio => radio.addEventListener('change', renderProducts));
 
-  // Logout
-  logoutBtn.addEventListener('click', async e => {
-    e.preventDefault();
-    await signOut(auth);
-    window.location.href = 'index.html'; // Zurück zur Login-Seite
-  });
+  // Erster Render
+  renderProducts();
 
-  // Menü Links
-  openSettings.addEventListener('click', e => {
-    e.preventDefault();
-    alert('Einstellungen noch nicht implementiert.');
-  });
-  openProfile.addEventListener('click', e => {
-    e.preventDefault();
-    content.style.display = 'none';
-    profileSection.style.display = 'block';
-    dropdownMenu.classList.remove('show');
-  });
-
-  // Auth Check
-  onAuthStateChanged(auth, user => {
-    if (!user) {
-      // Kein User -> Login
-      window.location.href = 'index.html';
-    } else {
-      // User ist eingeloggt
-      userNameElem.textContent = user.email.split('@')[0] || 'Mein Lord';
-      userEmailElem.textContent = user.email;
-      showProducts();
-    }
-  });
 </script>
 
 </body>
