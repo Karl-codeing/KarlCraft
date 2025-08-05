@@ -129,16 +129,11 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    if (!email || !password) {
-      messageP.textContent = "E-Mail und Passwort eingeben.";
-      return;
-    }
-
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         messageP.style.color = 'green';
         messageP.textContent = "Login erfolgreich!";
-        // Weiterleitung z. B. auf Dashboard.html oder Shop-Seite
+        // Weiterleitung bei Erfolg (z. B. Dashboard)
         // window.location.href = "dashboard.html";
       })
       .catch(error => {
