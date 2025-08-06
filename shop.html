@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shop Ziegler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Willkommen bei Shop Ziegler</h2>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
+  <script type="module">
+    import { auth } from './firebase-config.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = 'index.html';
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      signOut(auth).then(() => window.location.href = 'index.html');
+    });
+  </script>
+</body>
+</html>
