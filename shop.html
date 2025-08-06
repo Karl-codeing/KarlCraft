@@ -5,438 +5,557 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Shop Ziegler</title>
 <style>
-  /* Grundstyle */
+  /* Reset & Basics */
+  * {
+    box-sizing: border-box;
+  }
   body {
-    margin: 0; padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f7faff;
-    color: #222;
-  }
-  header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 60px;
-    background: #005bb5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1.5rem;
-    color: white;
-    box-shadow: 0 3px 6px rgb(0 0 0 / 0.15);
-    z-index: 1000;
-  }
-  header h1 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.5rem;
+    margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f8; color: #222;
   }
 
-  /* Suchleiste */
-  #searchContainer {
-    margin-left: 1rem;
-    flex-grow: 1;
-    max-width: 400px;
+  /* Header */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px;
+    background: #004aad;
+    color: white;
+    display: flex; align-items: center; padding: 0 24px;
+    justify-content: space-between;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    z-index: 100;
   }
-  #searchInput {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+  header .logo {
+    font-weight: 700; font-size: 1.5rem;
+  }
+  header .search-wrapper {
+    flex-grow: 1; max-width: 500px; margin: 0 24px;
+  }
+  header input[type="search"] {
+    width: 100%; padding: 8px 16px;
+    border-radius: 30px;
     border: none;
     font-size: 1rem;
-    transition: box-shadow 0.3s;
+    transition: box-shadow 0.25s ease;
   }
-  #searchInput:focus {
+  header input[type="search"]:focus {
     outline: none;
-    box-shadow: 0 0 8px #0073e6;
+    box-shadow: 0 0 8px #3a76f0;
   }
 
-  /* Zahnrad & Dropdown */
-  #settingsContainer {
+  /* Header right icons */
+  header .actions {
+    display: flex; align-items: center; gap: 20px;
+    position: relative;
+  }
+  header .cart {
     position: relative;
     cursor: pointer;
   }
-  #gearIcon {
-    width: 28px; height: 28px;
-    fill: white;
-    transition: transform 0.3s;
+  header .cart svg {
+    width: 28px; height: 28px; fill: white;
   }
-  #settingsContainer:hover #gearIcon {
+  header .cart .count {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: #e94560;
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    user-select: none;
+  }
+  /* Dropdown Gear */
+  header .settings {
+    cursor: pointer;
+    position: relative;
+  }
+  header .settings svg {
+    width: 28px; height: 28px; fill: white;
+    transition: transform 0.3s ease;
+  }
+  header .settings.open svg {
     transform: rotate(90deg);
   }
-  #dropdownMenu {
+  header .dropdown-menu {
     position: absolute;
-    top: 38px;
-    right: 0;
+    top: 36px; right: 0;
     background: white;
+    color: #004aad;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    min-width: 150px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    min-width: 160px;
     display: none;
     flex-direction: column;
+    z-index: 1000;
   }
-  #dropdownMenu a {
-    padding: 10px 15px;
-    color: #005bb5;
+  header .dropdown-menu a {
+    padding: 12px 18px;
     text-decoration: none;
+    color: #004aad;
     font-weight: 600;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
   }
-  #dropdownMenu a:hover {
-    background-color: #e6f0ff;
+  header .dropdown-menu a:last-child {
+    border-bottom: none;
   }
-  #settingsContainer.active #dropdownMenu {
+  header .dropdown-menu a:hover {
+    background-color: #e0eaff;
+  }
+  header .settings.open .dropdown-menu {
     display: flex;
   }
 
-  /* Layout */
+  /* Layout Main */
   main {
     display: flex;
-    padding: 80px 20px 40px 20px;
+    margin-top: 64px;
+    padding: 20px 24px;
     gap: 20px;
   }
 
-  /* Preisfilter */
-  #priceFilter {
-    width: 200px;
-    background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 12px rgb(0 91 181 / 0.15);
-    height: 300px;
-    position: sticky;
-    top: 80px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  #priceFilter h3 {
-    margin-bottom: 1rem;
-    color: #005bb5;
-    font-weight: 700;
-    text-align: center;
-  }
-  #priceRange {
-    width: 100%;
-  }
-  #priceValue {
-    margin-top: 0.7rem;
-    text-align: center;
-    font-weight: 600;
-    color: #005bb5;
-  }
-
-  /* Produktbereich */
-  #productsContainer {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
-    gap: 20px;
-  }
-
-  /* Produktkarte */
-  .productCard {
+  /* Sidebar */
+  aside.sidebar {
+    width: 260px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    padding: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+    position: sticky;
+    top: 84px;
+    height: fit-content;
+  }
+  aside.sidebar h2 {
+    font-weight: 700;
+    color: #004aad;
+    margin-bottom: 18px;
+    font-size: 1.25rem;
+  }
+  .price-filter {
+    margin-top: 12px;
+  }
+  .price-filter label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 8px;
+    background: #ddd;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #004aad;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,74,173,0.5);
+    transition: background 0.3s;
+  }
+  input[type=range]:active::-webkit-slider-thumb {
+    background: #003080;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #004aad;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,74,173,0.5);
+    transition: background 0.3s;
+  }
+
+  /* Produkte Grid */
+  section.products {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+  }
+  .product-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .productCard:hover {
+  .product-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgb(0 0 0 / 0.18);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
   }
-  .productImg {
-    height: 140px;
+  .product-card img {
+    width: 100%;
     object-fit: contain;
-    margin-bottom: 10px;
+    height: 160px;
+    background: #f8f8f8;
   }
-  .productTitle {
+  .product-info {
+    padding: 12px 16px 18px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product-title {
     font-weight: 700;
-    margin-bottom: 6px;
+    color: #004aad;
     font-size: 1.1rem;
-    color: #0046be;
+    margin-bottom: 8px;
   }
-  .productPrice {
-    color: #0073e6;
-    font-weight: 600;
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+  .product-price {
+    font-weight: 700;
+    color: #e94560;
+    font-size: 1.2rem;
   }
 
-  /* Produkt-Details Overlay */
-  #productDetailsOverlay {
+  /* Modal Overlay */
+  .modal-overlay {
     position: fixed;
-    top: 0; left: 0; right:0; bottom:0;
-    background: rgba(0,0,0,0.6);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1100;
+    z-index: 10000;
   }
-  #productDetailsContent {
+  .modal-content {
     background: white;
-    border-radius: 14px;
-    max-width: 650px;
+    border-radius: 16px;
+    max-width: 800px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-    padding: 1.8rem;
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     position: relative;
-    box-shadow: 0 8px 30px rgb(0 0 0 / 0.25);
   }
-  #productDetailsContent img {
-    max-width: 48%;
-    border-radius: 10px;
-    margin-right: 1rem;
+  .modal-content img {
+    width: 45%;
+    border-radius: 12px;
+    object-fit: contain;
   }
-  #productInfo {
-    display: inline-block;
-    vertical-align: top;
-    max-width: 45%;
+  .modal-info {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
   }
-  #productInfo h2 {
+  .modal-info h3 {
     margin-top: 0;
-    color: #0046be;
+    font-size: 1.8rem;
+    color: #004aad;
   }
-  #productInfo p {
-    font-size: 0.95rem;
+  .modal-info p {
+    flex-grow: 1;
+    margin-top: 12px;
+    font-size: 1rem;
+    line-height: 1.4;
     color: #333;
-    margin-bottom: 1rem;
   }
-  #productInfo .price {
+  .modal-price {
     font-weight: 700;
-    font-size: 1.3rem;
-    color: #0073e6;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #e94560;
+    margin: 18px 0 24px;
   }
-  #productInfo button {
-    padding: 0.6rem 1.2rem;
-    background-color: #0073e6;
+  .modal-buttons {
+    display: flex;
+    gap: 14px;
+  }
+  .modal-buttons button {
+    flex: 1;
+    padding: 14px 0;
     border: none;
-    border-radius: 7px;
-    color: white;
+    border-radius: 12px;
     font-weight: 700;
+    font-size: 1.1rem;
     cursor: pointer;
-    margin-right: 1rem;
     transition: background-color 0.3s;
   }
-  #productInfo button:hover {
-    background-color: #005bb5;
+  .btn-add {
+    background: #004aad;
+    color: white;
   }
-  #closeDetailsBtn {
+  .btn-add:hover {
+    background: #003080;
+  }
+  .btn-buy {
+    background: #e94560;
+    color: white;
+  }
+  .btn-buy:hover {
+    background: #b82847;
+  }
+  .modal-close {
     position: absolute;
-    top: 15px; right: 15px;
-    font-size: 1.8rem;
+    top: 14px;
+    right: 14px;
+    font-size: 2rem;
     font-weight: 700;
+    color: #999;
     cursor: pointer;
-    color: #777;
+    user-select: none;
   }
-  #closeDetailsBtn:hover {
-    color: #222;
+  .modal-close:hover {
+    color: #444;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    main {
+      flex-direction: column;
+    }
+    aside.sidebar {
+      width: 100%;
+      position: static;
+      margin-bottom: 20px;
+      top: auto;
+    }
+    section.products {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .modal-content {
+      flex-direction: column;
+      width: 95%;
+    }
+    .modal-content img,
+    .modal-info {
+      width: 100%;
+    }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Shop Ziegler</h1>
-  <div id="searchContainer">
-    <input id="searchInput" type="text" placeholder="Produkte suchen..." />
+  <div class="logo">Shop Ziegler</div>
+  <div class="search-wrapper">
+    <input type="search" id="searchInput" placeholder="Suche Produkte..." />
   </div>
-  <div id="settingsContainer" title="Menü">
-    <svg id="gearIcon" viewBox="0 0 24 24">
-      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-      <path d="M19.43 12.98l1.77-1.03-1.03-1.77-1.68.97a7.5 7.5 0 0 0-1.58-1.58l.97-1.68-1.77-1.03-1.03 1.77-.97 1.68a7.5 7.5 0 0 0-1.58 1.58l-1.68-.97-1.03 1.77 1.77 1.03 1.68.97a7.5 7.5 0 0 0 1.58 1.58l-.97 1.68 1.03 1.77 1.77-1.03.97-1.68a7.5 7.5 0 0 0 1.58-1.58z"/>
-    </svg>
-    <div id="dropdownMenu">
-      <a href="settings.html">Einstellungen</a>
-      <a href="profile.html">Profil</a>
-      <a href="cart.html">Warenkorb</a>
-      <a href="#" id="logoutBtn">Logout</a>
+  <div class="actions">
+    <div class="cart" id="cartBtn" title="Warenkorb">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.104 0-2 .895-2 2s.896 2 2 2 2-.895 2-2-.896-2-2-2zm10 0c-1.104 0-2 .895-2 2s.896 2 2 2 2-.895 2-2-.896-2-2-2zm-12.243-2l1.527-6h11.853l1.827 6H4.757zm14.451-8h-3.057L15 4H7L6.05 8H3v2h1.293l3.277 13h10.86c.438 0 .77-.312.77-.742 0-.258-.138-.48-.355-.613L17.208 11H6.177L5.207 7z"/></svg>
+      <div class="count" id="cartCount">0</div>
+    </div>
+    <div class="settings" id="settingsBtn" title="Einstellungen">
+      <svg viewBox="0 0 24 24"><path d="M12 8.5c-1.933 0-3.5 1.567-3.5 3.5S10.067 15.5 12 15.5s3.5-1.567 3.5-3.5S13.933 8.5 12 8.5zM21.947 11l-1.354-1.766a8.11 8.11 0 0 0 .407-2.24 8.224 8.224 0 0 0-2.202-5.75l-2.02 1.62a6.702 6.702 0 0 0-3.815-1.29 6.752 6.752 0 0 0-3.82 1.29L7.205 2.24a8.224 8.224 0 0 0-2.202 5.75c0 .83.145 1.63.407 2.24L4.057 11a8.08 8.08 0 0 0 0 2.001l1.354 1.766a8.11 8.11 0 0 0-.407 2.24 8.224 8.224 0 0 0 2.202 5.75l2.02-1.62a6.7 6.7 0 0 0 3.815 1.29 6.7 6.7 0 0 0 3.82-1.29l2.02 1.62a8.224 8.224 0 0 0 2.202-5.75 8.11 8.11 0 0 0-.407-2.24L21.94 13a8.07 8.07 0 0 0 0-2z"/></svg>
+      <div class="dropdown-menu" id="settingsMenu">
+        <a href="#" id="profileLink">Profil</a>
+        <a href="#" id="logoutLink">Logout</a>
+      </div>
     </div>
   </div>
 </header>
 
 <main>
-  <aside id="priceFilter">
-    <h3>Preisfilter</h3>
-    <input type="range" id="priceRange" min="0" max="1000" step="10" value="1000" />
-    <div id="priceValue">Max: 1000€</div>
+  <aside class="sidebar">
+    <h2>Preis filtern</h2>
+    <div class="price-filter">
+      <label for="priceRange">Maximal: <span id="priceValue">1000</span> €</label>
+      <input type="range" id="priceRange" min="0" max="1000" value="1000" step="10" />
+    </div>
   </aside>
-
-  <section id="productsContainer"></section>
+  <section class="products" id="productGrid">
+    <!-- Produkte kommen hier dynamisch rein -->
+  </section>
 </main>
 
-<!-- Produkt Details Overlay -->
-<div id="productDetailsOverlay">
-  <div id="productDetailsContent">
-    <span id="closeDetailsBtn">&times;</span>
-    <img id="productImg1" src="" alt="Produktbild 1" />
-    <img id="productImg2" src="" alt="Produktbild 2" />
-    <div id="productInfo">
-      <h2 id="productTitle"></h2>
-      <p id="productDescription"></p>
-      <div class="price" id="productPrice"></div>
-      <button id="addToCartBtn">In den Warenkorb</button>
-      <button id="buyNowBtn">Jetzt kaufen</button>
+<!-- Produkt Modal -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal-content">
+    <div>
+      <img src="" alt="Produktbild" id="modalImg1" />
+      <img src="" alt="Produktbild" id="modalImg2" style="margin-top: 14px;" />
     </div>
+    <div class="modal-info">
+      <h3 id="modalTitle"></h3>
+      <p id="modalDesc"></p>
+      <div class="modal-price" id="modalPrice"></div>
+      <div class="modal-buttons">
+        <button class="btn-add" id="btnAddCart">Zum Warenkorb</button>
+        <button class="btn-buy" id="btnBuyNow">Kaufen</button>
+      </div>
+    </div>
+    <div class="modal-close" id="modalClose">&times;</div>
   </div>
 </div>
 
-<script type="module">
-  // Firebase Config & Imports
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
-    authDomain: "github-site-a4366.firebaseapp.com",
-    projectId: "github-site-a4366",
-    storageBucket: "github-site-a4366.firebasestorage.app",
-    messagingSenderId: "928253879225",
-    appId: "1:928253879225:web:822f4f14079a9de2facc68",
-    measurementId: "G-XNPYTECHDG"
-  };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Check Login
-  onAuthStateChanged(auth, user => {
-    if (!user) window.location.href = "index.html";
-  });
-
-  // Logout
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    signOut(auth).then(() => window.location.href = "index.html");
-  });
-
-  // Produkte Beispiel
+<script>
+  // Beispiel Produkte
   const products = [
     {
       id: 1,
-      title: "Gaming Maus",
-      price: 59.99,
-      description: "Ergonomische Maus mit hoher Präzision.",
-      images: [
-        "https://via.placeholder.com/300x200?text=Maus+1",
-        "https://via.placeholder.com/300x200?text=Maus+2"
-      ]
+      title: "Gaming Laptop",
+      price: 899.99,
+      desc: "Leistungsstarker Laptop mit RTX Grafik und 16GB RAM.",
+      img1: "https://via.placeholder.com/400x300?text=Gaming+Laptop+1",
+      img2: "https://via.placeholder.com/400x300?text=Gaming+Laptop+2"
     },
     {
       id: 2,
-      title: "Mechanische Tastatur",
-      price: 129.99,
-      description: "Robuste mechanische Tastatur mit RGB-Beleuchtung.",
-      images: [
-        "https://via.placeholder.com/300x200?text=Tastatur+1",
-        "https://via.placeholder.com/300x200?text=Tastatur+2"
-      ]
+      title: "Smartphone Pro",
+      price: 699.50,
+      desc: "Top Smartphone mit großem Display und schneller Kamera.",
+      img1: "https://via.placeholder.com/400x300?text=Smartphone+Pro+1",
+      img2: "https://via.placeholder.com/400x300?text=Smartphone+Pro+2"
     },
     {
       id: 3,
-      title: "Gaming Monitor",
-      price: 299.99,
-      description: "27 Zoll Full HD Monitor mit 144Hz.",
-      images: [
-        "https://via.placeholder.com/300x200?text=Monitor+1",
-        "https://via.placeholder.com/300x200?text=Monitor+2"
-      ]
+      title: "Wireless Kopfhörer",
+      price: 149.90,
+      desc: "Kabellose Kopfhörer mit Noise Cancelling.",
+      img1: "https://via.placeholder.com/400x300?text=Kopfhörer+1",
+      img2: "https://via.placeholder.com/400x300?text=Kopfhörer+2"
     },
-    // ... mehr Produkte
+    {
+      id: 4,
+      title: "Smartwatch X",
+      price: 249.00,
+      desc: "Stylische Smartwatch mit vielen Fitnessfunktionen.",
+      img1: "https://via.placeholder.com/400x300?text=Smartwatch+1",
+      img2: "https://via.placeholder.com/400x300?text=Smartwatch+2"
+    },
+    {
+      id: 5,
+      title: "4K Monitor",
+      price: 399.99,
+      desc: "Hochauflösender Monitor mit 60Hz Bildwiederholrate.",
+      img1: "https://via.placeholder.com/400x300?text=Monitor+1",
+      img2: "https://via.placeholder.com/400x300?text=Monitor+2"
+    },
+    {
+      id: 6,
+      title: "Bluetooth Lautsprecher",
+      price: 79.99,
+      desc: "Kompakter Lautsprecher mit klarem Sound.",
+      img1: "https://via.placeholder.com/400x300?text=Lautsprecher+1",
+      img2: "https://via.placeholder.com/400x300?text=Lautsprecher+2"
+    }
   ];
 
-  const productsContainer = document.getElementById("productsContainer");
-  const priceRange = document.getElementById("priceRange");
-  const priceValue = document.getElementById("priceValue");
-  const searchInput = document.getElementById("searchInput");
+  const productGrid = document.getElementById('productGrid');
+  const searchInput = document.getElementById('searchInput');
+  const priceRange = document.getElementById('priceRange');
+  const priceValue = document.getElementById('priceValue');
+  const productModal = document.getElementById('productModal');
+  const modalImg1 = document.getElementById('modalImg1');
+  const modalImg2 = document.getElementById('modalImg2');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc = document.getElementById('modalDesc');
+  const modalPrice = document.getElementById('modalPrice');
+  const btnAddCart = document.getElementById('btnAddCart');
+  const btnBuyNow = document.getElementById('btnBuyNow');
+  const modalClose = document.getElementById('modalClose');
+  const cartBtn = document.getElementById('cartBtn');
+  const cartCount = document.getElementById('cartCount');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsMenu = document.getElementById('settingsMenu');
+  const logoutLink = document.getElementById('logoutLink');
+  const profileLink = document.getElementById('profileLink');
 
-  // Produkte rendern
+  let filteredProducts = [...products];
+  let cart = [];
+
   function renderProducts() {
-    const maxPrice = Number(priceRange.value);
-    const searchTerm = searchInput.value.toLowerCase();
-
-    productsContainer.innerHTML = "";
-
-    const filtered = products.filter(p =>
-      p.price <= maxPrice &&
-      p.title.toLowerCase().includes(searchTerm)
-    );
-
-    if (filtered.length === 0) {
-      productsContainer.innerHTML = "<p>Keine Produkte gefunden.</p>";
+    productGrid.innerHTML = "";
+    if(filteredProducts.length === 0) {
+      productGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#777;">Keine Produkte gefunden.</p>';
       return;
     }
-
-    filtered.forEach(p => {
-      const card = document.createElement("div");
-      card.className = "productCard";
+    filteredProducts.forEach(product => {
+      const card = document.createElement('article');
+      card.classList.add('product-card');
       card.innerHTML = `
-        <img class="productImg" src="${p.images[0]}" alt="${p.title}" />
-        <div class="productTitle">${p.title}</div>
-        <div class="productPrice">${p.price.toFixed(2)} €</div>
+        <img src="${product.img1}" alt="${product.title}" />
+        <div class="product-info">
+          <h3 class="product-title">${product.title}</h3>
+          <div class="product-price">${product.price.toFixed(2)} €</div>
+        </div>
       `;
-      card.onclick = () => openProductDetails(p);
-      productsContainer.appendChild(card);
+      card.onclick = () => openModal(product);
+      productGrid.appendChild(card);
     });
   }
 
-  priceRange.addEventListener("input", () => {
-    priceValue.textContent = `Max: ${priceRange.value}€`;
-    renderProducts();
-  });
+  function openModal(product) {
+    modalImg1.src = product.img1;
+    modalImg2.src = product.img2;
+    modalTitle.textContent = product.title;
+    modalDesc.textContent = product.desc;
+    modalPrice.textContent = product.price.toFixed(2) + " €";
 
-  searchInput.addEventListener("input", () => {
-    renderProducts();
-  });
-
-  renderProducts();
-
-  // Dropdown Zahnrad toggle
-  const settingsContainer = document.getElementById("settingsContainer");
-  settingsContainer.addEventListener("click", () => {
-    settingsContainer.classList.toggle("active");
-  });
-
-  // Produkt Details Overlay
-  const overlay = document.getElementById("productDetailsOverlay");
-  const productImg1 = document.getElementById("productImg1");
-  const productImg2 = document.getElementById("productImg2");
-  const productTitle = document.getElementById("productTitle");
-  const productDescription = document.getElementById("productDescription");
-  const productPrice = document.getElementById("productPrice");
-  const addToCartBtn = document.getElementById("addToCartBtn");
-  const buyNowBtn = document.getElementById("buyNowBtn");
-  const closeDetailsBtn = document.getElementById("closeDetailsBtn");
-
-  function openProductDetails(product) {
-    productImg1.src = product.images[0];
-    productImg2.src = product.images[1] || product.images[0];
-    productTitle.textContent = product.title;
-    productDescription.textContent = product.description;
-    productPrice.textContent = product.price.toFixed(2) + " €";
-
-    addToCartBtn.onclick = () => {
-      alert(`Produkt "${product.title}" wurde zum Warenkorb hinzugefügt.`);
-      overlay.style.display = "none";
+    btnAddCart.onclick = () => {
+      addToCart(product);
+      closeModal();
     };
-    buyNowBtn.onclick = () => {
+    btnBuyNow.onclick = () => {
       alert(`Kaufe "${product.title}" jetzt! (Simuliert)`);
-      overlay.style.display = "none";
+      closeModal();
     };
 
-    overlay.style.display = "flex";
+    productModal.style.display = 'flex';
   }
-  closeDetailsBtn.onclick = () => {
-    overlay.style.display = "none";
+
+  function closeModal() {
+    productModal.style.display = 'none';
+  }
+
+  function addToCart(product) {
+    cart.push(product);
+    cartCount.textContent = cart.length;
+    alert(`Produkt "${product.title}" wurde zum Warenkorb hinzugefügt.`);
+  }
+
+  function filterProducts() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const maxPrice = parseFloat(priceRange.value);
+
+    filteredProducts = products.filter(product => {
+      return product.price <= maxPrice && product.title.toLowerCase().includes(searchTerm);
+    });
+    priceValue.textContent = maxPrice.toFixed(0);
+    renderProducts();
+  }
+
+  searchInput.addEventListener('input', filterProducts);
+  priceRange.addEventListener('input', filterProducts);
+  modalClose.addEventListener('click', closeModal);
+  window.addEventListener('click', e => {
+    if(e.target === productModal) closeModal();
+  });
+
+  // Settings dropdown
+  settingsBtn.addEventListener('click', () => {
+    settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
+  });
+  window.addEventListener('click', e => {
+    if(!settingsBtn.contains(e.target)) {
+      settingsMenu.style.display = 'none';
+    }
+  });
+
+  logoutLink.onclick = (e) => {
+    e.preventDefault();
+    alert('Logout erfolgreich (simuliert)');
   };
-  overlay.onclick = e => {
-    if (e.target === overlay) overlay.style.display = "none";
+  profileLink.onclick = (e) => {
+    e.preventDefault();
+    alert('Profilseite (simuliert)');
   };
 
+  // Erstmal alles rendern
+  renderProducts();
 </script>
 
 </body>
