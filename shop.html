@@ -1,27 +1,80 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Shop Ziegler</title>
+  <meta charset="UTF-8"><title>Shop Ziegler</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Shop Ziegler</h1>
+    <div id="controls">
+      <input type="text" id="searchInput" placeholder="Suche..." />
+      <select id="filterSelect">
+        <option value="">Alle Preise</option><option value="50">Unter 50€</option><option value="100">Unter 100€</option>
+      </select>
+      <button id="logoutBtn">Logout</button>
+      <div id="settingsMenu">
+        <button id="settingsIcon">⚙</button>
+        <div id="dropdownMenu">
+          <a href="shop.html">Produkte</a>
+          <a href="#">Profil</a>
+          <a href="#">Warenkorb</a>
+        </div>
+      </div>
+    </div>
+  </header>
   <div class="container">
-    <h2>Willkommen bei Shop Ziegler</h2>
-    <button id="logoutBtn">Logout</button>
+    <div id="productList" class="product-list"></div>
+  </div>
+
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalName"></h2>
+      <div><img id="modalImg1" /><img id="modalImg2" /></div>
+      <p id="modalDesc"></p><p>Preis: <span id="modalPrice"></span> €</p>
+      <button class="cart-btn">+ Warenkorb</button>
+      <button class="buy-btn">Kaufen</button>
+      <button class="close-btn" onclick="document.getElementById('productModal').classList.remove('active')">Schließen</button>
+    </div>
   </div>
 
   <script type="module">
     import { auth } from './firebase-config.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-    onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = 'index.html';
+    const products = [
+      {name:"Smartphone",price:299,images:["https://via.placeholder.com/300x200?text=Vorne","https://via.placeholder.com/300x200?text=Hinten"],description:"Tolles Handy."},
+      {name:"Laptop",price:799,images:["https://via.placeholder.com/300x200?text=Laptop+V","https://via.placeholder.com/300x200?text=Laptop+R"],description:"Starker Laptop."},
+      {name:"Kopfhörer",price:49,images:["https://via.placeholder.com/300x200?text=Hub+V","https://via.placeholder.com/300x200?text=Hub+S"],description:"Musik hören."}
+    ];
+    onAuthStateChanged(auth,user=>{
+      if(!user)window.location.href='index.html';
     });
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      signOut(auth).then(() => window.location.href = 'index.html');
-    });
+    document.getElementById('logoutBtn').onclick = ()=>signOut(auth).then(()=>location.href='index.html');
+    function render(){
+      const list=document.getElementById('productList');
+      const q=document.getElementById('searchInput').value.toLowerCase();
+      const max=parseFloat(document.getElementById('filterSelect').value)||Infinity;
+      list.innerHTML="";
+      products.filter(p=>p.name.toLowerCase().includes(q)&&p.price<=max)
+        .forEach(p=>{
+          const div=document.createElement('div');
+          div.className='product';
+          div.innerHTML=`<img src="${p.images[0]}"><h3>${p.name}</h3><p>${p.price} €</p>`;
+          div.onclick=()=>openModal(p);
+          list.appendChild(div);
+        });
+    }
+    function openModal(p){
+      document.getElementById('modalName').textContent=p.name;
+      document.getElementById('modalImg1').src=p.images[0];
+      document.getElementById('modalImg2').src=p.images[1];
+      document.getElementById('modalDesc').textContent=p.description;
+      document.getElementById('modalPrice').textContent=p.price.toFixed(2);
+      document.getElementById('productModal').classList.add('active');
+    }
+    document.getElementById('searchInput').oninput=render;
+    document.getElementById('filterSelect').onchange=render;
+    render();
   </script>
 </body>
 </html>
