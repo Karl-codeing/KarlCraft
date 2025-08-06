@@ -1,101 +1,443 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Shop Ziegler</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shop Ziegler</title>
+<style>
+  /* Grundstyle */
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f7faff;
+    color: #222;
+  }
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: #005bb5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    color: white;
+    box-shadow: 0 3px 6px rgb(0 0 0 / 0.15);
+    z-index: 1000;
+  }
+  header h1 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  /* Suchleiste */
+  #searchContainer {
+    margin-left: 1rem;
+    flex-grow: 1;
+    max-width: 400px;
+  }
+  #searchInput {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: none;
+    font-size: 1rem;
+    transition: box-shadow 0.3s;
+  }
+  #searchInput:focus {
+    outline: none;
+    box-shadow: 0 0 8px #0073e6;
+  }
+
+  /* Zahnrad & Dropdown */
+  #settingsContainer {
+    position: relative;
+    cursor: pointer;
+  }
+  #gearIcon {
+    width: 28px; height: 28px;
+    fill: white;
+    transition: transform 0.3s;
+  }
+  #settingsContainer:hover #gearIcon {
+    transform: rotate(90deg);
+  }
+  #dropdownMenu {
+    position: absolute;
+    top: 38px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    min-width: 150px;
+    display: none;
+    flex-direction: column;
+  }
+  #dropdownMenu a {
+    padding: 10px 15px;
+    color: #005bb5;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+  }
+  #dropdownMenu a:hover {
+    background-color: #e6f0ff;
+  }
+  #settingsContainer.active #dropdownMenu {
+    display: flex;
+  }
+
+  /* Layout */
+  main {
+    display: flex;
+    padding: 80px 20px 40px 20px;
+    gap: 20px;
+  }
+
+  /* Preisfilter */
+  #priceFilter {
+    width: 200px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 12px rgb(0 91 181 / 0.15);
+    height: 300px;
+    position: sticky;
+    top: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  #priceFilter h3 {
+    margin-bottom: 1rem;
+    color: #005bb5;
+    font-weight: 700;
+    text-align: center;
+  }
+  #priceRange {
+    width: 100%;
+  }
+  #priceValue {
+    margin-top: 0.7rem;
+    text-align: center;
+    font-weight: 600;
+    color: #005bb5;
+  }
+
+  /* Produktbereich */
+  #productsContainer {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+    gap: 20px;
+  }
+
+  /* Produktkarte */
+  .productCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .productCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.18);
+  }
+  .productImg {
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 10px;
+  }
+  .productTitle {
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+    color: #0046be;
+  }
+  .productPrice {
+    color: #0073e6;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+  }
+
+  /* Produkt-Details Overlay */
+  #productDetailsOverlay {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom:0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+  }
+  #productDetailsContent {
+    background: white;
+    border-radius: 14px;
+    max-width: 650px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1.8rem;
+    position: relative;
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.25);
+  }
+  #productDetailsContent img {
+    max-width: 48%;
+    border-radius: 10px;
+    margin-right: 1rem;
+  }
+  #productInfo {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 45%;
+  }
+  #productInfo h2 {
+    margin-top: 0;
+    color: #0046be;
+  }
+  #productInfo p {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  #productInfo .price {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #0073e6;
+    margin-bottom: 1.5rem;
+  }
+  #productInfo button {
+    padding: 0.6rem 1.2rem;
+    background-color: #0073e6;
+    border: none;
+    border-radius: 7px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: background-color 0.3s;
+  }
+  #productInfo button:hover {
+    background-color: #005bb5;
+  }
+  #closeDetailsBtn {
+    position: absolute;
+    top: 15px; right: 15px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #777;
+  }
+  #closeDetailsBtn:hover {
+    color: #222;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Shop Ziegler</h1>
-    <div id="controls">
-      <input type="text" id="searchInput" placeholder="🔍 Suche..." />
-      <button id="logoutBtn">Logout</button>
-      <div id="settingsMenu">
-        <button id="settingsIcon">⚙</button>
-        <div id="dropdownMenu">
-          <a href="#">Produkte</a>
-          <a href="#">Warenkorb</a>
-          <a href="#">Profil</a>
-        </div>
-      </div>
-    </div>
-  </header>
 
-  <div class="container">
-    <div id="filterBox">
-      <label for="priceRange">Preisfilter (max €): <span id="priceLabel">1000</span></label>
-      <input type="range" id="priceRange" min="0" max="1000" value="1000" />
-    </div>
-
-    <div id="productList" class="product-list"></div>
+<header>
+  <h1>Shop Ziegler</h1>
+  <div id="searchContainer">
+    <input id="searchInput" type="text" placeholder="Produkte suchen..." />
   </div>
-
-  <div id="productModal" class="modal">
-    <div class="modal-content">
-      <h2 id="modalName"></h2>
-      <div><img id="modalImg1"><img id="modalImg2"></div>
-      <p id="modalDesc"></p>
-      <p>Preis: <span id="modalPrice"></span> €</p>
-      <button class="cart-btn">+ Warenkorb</button>
-      <button class="buy-btn">Kaufen</button>
-      <button class="close-btn" onclick="document.getElementById('productModal').classList.remove('active')">Schließen</button>
+  <div id="settingsContainer" title="Menü">
+    <svg id="gearIcon" viewBox="0 0 24 24">
+      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+      <path d="M19.43 12.98l1.77-1.03-1.03-1.77-1.68.97a7.5 7.5 0 0 0-1.58-1.58l.97-1.68-1.77-1.03-1.03 1.77-.97 1.68a7.5 7.5 0 0 0-1.58 1.58l-1.68-.97-1.03 1.77 1.77 1.03 1.68.97a7.5 7.5 0 0 0 1.58 1.58l-.97 1.68 1.03 1.77 1.77-1.03.97-1.68a7.5 7.5 0 0 0 1.58-1.58z"/>
+    </svg>
+    <div id="dropdownMenu">
+      <a href="settings.html">Einstellungen</a>
+      <a href="profile.html">Profil</a>
+      <a href="cart.html">Warenkorb</a>
+      <a href="#" id="logoutBtn">Logout</a>
     </div>
   </div>
+</header>
 
-  <script type="module">
-    import { auth } from './firebase-config.js';
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+<main>
+  <aside id="priceFilter">
+    <h3>Preisfilter</h3>
+    <input type="range" id="priceRange" min="0" max="1000" step="10" value="1000" />
+    <div id="priceValue">Max: 1000€</div>
+  </aside>
 
-    const products = [
-      { name: "Smartphone", price: 299, images: ["https://via.placeholder.com/300x200?text=Vorne", "https://via.placeholder.com/300x200?text=Hinten"], description: "Tolles Handy." },
-      { name: "Laptop", price: 799, images: ["https://via.placeholder.com/300x200?text=Laptop+V", "https://via.placeholder.com/300x200?text=Laptop+R"], description: "Starker Laptop." },
-      { name: "Kopfhörer", price: 49, images: ["https://via.placeholder.com/300x200?text=Hub+V", "https://via.placeholder.com/300x200?text=Hub+S"], description: "Musik hören." }
-    ];
+  <section id="productsContainer"></section>
+</main>
 
-    onAuthStateChanged(auth, user => {
-      if (!user) window.location.href = 'index.html';
+<!-- Produkt Details Overlay -->
+<div id="productDetailsOverlay">
+  <div id="productDetailsContent">
+    <span id="closeDetailsBtn">&times;</span>
+    <img id="productImg1" src="" alt="Produktbild 1" />
+    <img id="productImg2" src="" alt="Produktbild 2" />
+    <div id="productInfo">
+      <h2 id="productTitle"></h2>
+      <p id="productDescription"></p>
+      <div class="price" id="productPrice"></div>
+      <button id="addToCartBtn">In den Warenkorb</button>
+      <button id="buyNowBtn">Jetzt kaufen</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // Firebase Config & Imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyArXMXE0JrKTURP3DsryIjfDCRIp41x_sY",
+    authDomain: "github-site-a4366.firebaseapp.com",
+    projectId: "github-site-a4366",
+    storageBucket: "github-site-a4366.firebasestorage.app",
+    messagingSenderId: "928253879225",
+    appId: "1:928253879225:web:822f4f14079a9de2facc68",
+    measurementId: "G-XNPYTECHDG"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Check Login
+  onAuthStateChanged(auth, user => {
+    if (!user) window.location.href = "index.html";
+  });
+
+  // Logout
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    signOut(auth).then(() => window.location.href = "index.html");
+  });
+
+  // Produkte Beispiel
+  const products = [
+    {
+      id: 1,
+      title: "Gaming Maus",
+      price: 59.99,
+      description: "Ergonomische Maus mit hoher Präzision.",
+      images: [
+        "https://via.placeholder.com/300x200?text=Maus+1",
+        "https://via.placeholder.com/300x200?text=Maus+2"
+      ]
+    },
+    {
+      id: 2,
+      title: "Mechanische Tastatur",
+      price: 129.99,
+      description: "Robuste mechanische Tastatur mit RGB-Beleuchtung.",
+      images: [
+        "https://via.placeholder.com/300x200?text=Tastatur+1",
+        "https://via.placeholder.com/300x200?text=Tastatur+2"
+      ]
+    },
+    {
+      id: 3,
+      title: "Gaming Monitor",
+      price: 299.99,
+      description: "27 Zoll Full HD Monitor mit 144Hz.",
+      images: [
+        "https://via.placeholder.com/300x200?text=Monitor+1",
+        "https://via.placeholder.com/300x200?text=Monitor+2"
+      ]
+    },
+    // ... mehr Produkte
+  ];
+
+  const productsContainer = document.getElementById("productsContainer");
+  const priceRange = document.getElementById("priceRange");
+  const priceValue = document.getElementById("priceValue");
+  const searchInput = document.getElementById("searchInput");
+
+  // Produkte rendern
+  function renderProducts() {
+    const maxPrice = Number(priceRange.value);
+    const searchTerm = searchInput.value.toLowerCase();
+
+    productsContainer.innerHTML = "";
+
+    const filtered = products.filter(p =>
+      p.price <= maxPrice &&
+      p.title.toLowerCase().includes(searchTerm)
+    );
+
+    if (filtered.length === 0) {
+      productsContainer.innerHTML = "<p>Keine Produkte gefunden.</p>";
+      return;
+    }
+
+    filtered.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "productCard";
+      card.innerHTML = `
+        <img class="productImg" src="${p.images[0]}" alt="${p.title}" />
+        <div class="productTitle">${p.title}</div>
+        <div class="productPrice">${p.price.toFixed(2)} €</div>
+      `;
+      card.onclick = () => openProductDetails(p);
+      productsContainer.appendChild(card);
     });
+  }
 
-    document.getElementById('logoutBtn').onclick = () => {
-      signOut(auth).then(() => location.href = 'index.html');
+  priceRange.addEventListener("input", () => {
+    priceValue.textContent = `Max: ${priceRange.value}€`;
+    renderProducts();
+  });
+
+  searchInput.addEventListener("input", () => {
+    renderProducts();
+  });
+
+  renderProducts();
+
+  // Dropdown Zahnrad toggle
+  const settingsContainer = document.getElementById("settingsContainer");
+  settingsContainer.addEventListener("click", () => {
+    settingsContainer.classList.toggle("active");
+  });
+
+  // Produkt Details Overlay
+  const overlay = document.getElementById("productDetailsOverlay");
+  const productImg1 = document.getElementById("productImg1");
+  const productImg2 = document.getElementById("productImg2");
+  const productTitle = document.getElementById("productTitle");
+  const productDescription = document.getElementById("productDescription");
+  const productPrice = document.getElementById("productPrice");
+  const addToCartBtn = document.getElementById("addToCartBtn");
+  const buyNowBtn = document.getElementById("buyNowBtn");
+  const closeDetailsBtn = document.getElementById("closeDetailsBtn");
+
+  function openProductDetails(product) {
+    productImg1.src = product.images[0];
+    productImg2.src = product.images[1] || product.images[0];
+    productTitle.textContent = product.title;
+    productDescription.textContent = product.description;
+    productPrice.textContent = product.price.toFixed(2) + " €";
+
+    addToCartBtn.onclick = () => {
+      alert(`Produkt "${product.title}" wurde zum Warenkorb hinzugefügt.`);
+      overlay.style.display = "none";
+    };
+    buyNowBtn.onclick = () => {
+      alert(`Kaufe "${product.title}" jetzt! (Simuliert)`);
+      overlay.style.display = "none";
     };
 
-    const searchInput = document.getElementById('searchInput');
-    const priceRange = document.getElementById('priceRange');
-    const priceLabel = document.getElementById('priceLabel');
+    overlay.style.display = "flex";
+  }
+  closeDetailsBtn.onclick = () => {
+    overlay.style.display = "none";
+  };
+  overlay.onclick = e => {
+    if (e.target === overlay) overlay.style.display = "none";
+  };
 
-    function render() {
-      const q = searchInput.value.toLowerCase();
-      const max = parseFloat(priceRange.value);
-      priceLabel.textContent = max;
-      const list = document.getElementById('productList');
-      list.innerHTML = "";
+</script>
 
-      products
-        .filter(p => p.name.toLowerCase().includes(q) && p.price <= max)
-        .forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'product';
-          div.innerHTML = `<img src="${p.images[0]}"><h3>${p.name}</h3><p>${p.price} €</p>`;
-          div.onclick = () => openModal(p);
-          list.appendChild(div);
-        });
-    }
-
-    function openModal(p) {
-      document.getElementById('modalName').textContent = p.name;
-      document.getElementById('modalImg1').src = p.images[0];
-      document.getElementById('modalImg2').src = p.images[1];
-      document.getElementById('modalDesc').textContent = p.description;
-      document.getElementById('modalPrice').textContent = p.price.toFixed(2);
-      document.getElementById('productModal').classList.add('active');
-    }
-
-    searchInput.oninput = render;
-    priceRange.oninput = render;
-
-    render();
-  </script>
 </body>
 </html>
