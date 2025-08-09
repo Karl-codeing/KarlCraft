@@ -1,18 +1,330 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Karl-Craft-GPT</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <title>Karl-Craft-GPT</title>
+  <style>
+    body, html { margin: 0; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background: #000; }
+    #menu {
+      position: fixed; top:0; left:0; width:100vw; height:100vh;
+      background: rgba(0,0,0,0.9);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      color: white; z-index: 10;
+    }
+    #gameUI {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 5;
+    }
+    .hotbar-slot {
+      width: 40px; height: 40px; border: 2px solid white;
+      background: rgba(255,255,255,0.1);
+      display: flex; justify-content: center; align-items: center;
+      color: white; font-weight: bold; cursor: pointer;
+    }
+    .hotbar-slot.selected {
+      border-color: yellow;
+    }
+    #inventory {
+      position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+      width: 320px; height: 240px; background: rgba(0,0,0,0.85);
+      display: none; flex-wrap: wrap; gap: 6px; padding: 10px;
+      border: 2px solid white; color: white; z-index: 10;
+    }
+    .inv-slot {
+      width: 40px; height: 40px; background: rgba(255,255,255,0.1);
+      border: 1px solid white;
+      display: flex; justify-content: center; align-items: center;
+      user-select: none;
+    }
+    #settings {
+      margin-top: 20px;
+      color: white;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    label { user-select: none; }
+    button { cursor: pointer; padding: 5px 10px; }
+  </style>
 </head>
 <body>
+  <div id="menu">
     <h1>Karl-Craft-GPT</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div id="info">
-        <p>Steuerung: Pfeiltasten</p>
-        <p>Ziel: Sammle Ressourcen, baue deine Basis auf!</p>
+    <div id="settings">
+      <label>
+        FOV:
+        <input type="range" id="fovSlider" min="40" max="100" value="75"/>
+      </label>
+      <label>
+        Steuerung:
+        <select id="controlScheme">
+          <option value="wasd">WASD</option>
+          <option value="arrows">Pfeiltasten</option>
+        </select>
+      </label>
+      <button id="startBtn">Spiel Starten</button>
     </div>
-    <script src="game.js"></script>
+  </div>
+
+  <div id="gameUI">
+    <!-- Hotbar Slots -->
+  </div>
+
+  <div id="inventory"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
+  <script>
+    // --- Variablen & Setup ---
+    let scene, camera, renderer, controls;
+    let world = {};
+    const CHUNK_SIZE = 16;
+    const WORLD_HEIGHT = 32;
+    const BLOCK_SIZE = 1;
+    const hotbarSlots = 9;
+    let selectedSlot = 0;
+    let inventory = new Array(hotbarSlots).fill('dirt');
+    let blockTypes = {
+      dirt: 0x8B4513,
+      grass: 0x228B22,
+      stone: 0x888888,
+      wood: 0x654321
+    };
+
+    // Menu Elemente
+    const menu = document.getElementById('menu');
+    const startBtn = document.getElementById('startBtn');
+    const fovSlider = document.getElementById('fovSlider');
+    const controlScheme = document.getElementById('controlScheme');
+    const gameUI = document.getElementById('gameUI');
+    const inventoryDiv = document.getElementById('inventory');
+
+    // Hotbar rendern
+    function renderHotbar() {
+      gameUI.innerHTML = '';
+      for(let i=0; i<hotbarSlots; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'hotbar-slot';
+        if(i === selectedSlot) slot.classList.add('selected');
+        slot.textContent = inventory[i] ? inventory[i][0].toUpperCase() : '';
+        slot.onclick = () => {
+          selectedSlot = i;
+          renderHotbar();
+        };
+        gameUI.appendChild(slot);
+      }
+    }
+
+    // Inventory rendern
+    function renderInventory() {
+      inventoryDiv.innerHTML = '';
+      for(let i=0; i<inventory.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'inv-slot';
+        slot.textContent = inventory[i] ? inventory[i][0].toUpperCase() : '';
+        inventoryDiv.appendChild(slot);
+      }
+    }
+
+    // Welt-Gen (random Terrain, simple)
+    function generateWorld() {
+      // world wird als dictionary mit key: "x,y,z" gespeichert
+      for(let x = -CHUNK_SIZE; x < CHUNK_SIZE; x++) {
+        for(let z = -CHUNK_SIZE; z < CHUNK_SIZE; z++) {
+          let height = Math.floor(10 + 5 * Math.sin(x/5) * Math.cos(z/5));
+          for(let y = 0; y < WORLD_HEIGHT; y++) {
+            if(y < height -1) {
+              setBlock(x,y,z, 'stone');
+            } else if (y === height -1) {
+              setBlock(x,y,z, 'grass');
+            } else {
+              setBlock(x,y,z, null);
+            }
+          }
+        }
+      }
+    }
+
+    // Block erstellen / löschen
+    function setBlock(x,y,z,type) {
+      const key = `${x},${y},${z}`;
+      if(world[key]) {
+        scene.remove(world[key]);
+        delete world[key];
+      }
+      if(type) {
+        const geometry = new THREE.BoxGeometry(BLOCK_SIZE,BLOCK_SIZE,BLOCK_SIZE);
+        const material = new THREE.MeshStandardMaterial({color: blockTypes[type]});
+        const block = new THREE.Mesh(geometry, material);
+        block.position.set(x * BLOCK_SIZE + BLOCK_SIZE/2, y * BLOCK_SIZE + BLOCK_SIZE/2, z * BLOCK_SIZE + BLOCK_SIZE/2);
+        block.userData = {type, x, y, z};
+        scene.add(block);
+        world[key] = block;
+      }
+    }
+
+    // Raycast für Abbau/Platzierung
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function getLookingBlock() {
+      raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+      const intersects = raycaster.intersectObjects(Object.values(world));
+      if(intersects.length > 0) return intersects[0];
+      return null;
+    }
+
+    // Input & Steuerung
+    let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+    let velocity = new THREE.Vector3();
+
+    function onKeyDown(e) {
+      const code = e.code;
+      if(controlScheme.value === 'wasd') {
+        if(code === 'KeyW') moveForward = true;
+        if(code === 'KeyS') moveBackward = true;
+        if(code === 'KeyA') moveLeft = true;
+        if(code === 'KeyD') moveRight = true;
+      } else {
+        if(code === 'ArrowUp') moveForward = true;
+        if(code === 'ArrowDown') moveBackward = true;
+        if(code === 'ArrowLeft') moveLeft = true;
+        if(code === 'ArrowRight') moveRight = true;
+      }
+      if(code === 'KeyI') {
+        if(inventoryDiv.style.display === 'flex') inventoryDiv.style.display = 'none';
+        else inventoryDiv.style.display = 'flex';
+      }
+    }
+
+    function onKeyUp(e) {
+      const code = e.code;
+      if(controlScheme.value === 'wasd') {
+        if(code === 'KeyW') moveForward = false;
+        if(code === 'KeyS') moveBackward = false;
+        if(code === 'KeyA') moveLeft = false;
+        if(code === 'KeyD') moveRight = false;
+      } else {
+        if(code === 'ArrowUp') moveForward = false;
+        if(code === 'ArrowDown') moveBackward = false;
+        if(code === 'ArrowLeft') moveLeft = false;
+        if(code === 'ArrowRight') moveRight = false;
+      }
+    }
+
+    function onWheel(e) {
+      if(e.deltaY < 0) {
+        selectedSlot = (selectedSlot + 1) % hotbarSlots;
+      } else {
+        selectedSlot = (selectedSlot -1 + hotbarSlots) % hotbarSlots;
+      }
+      renderHotbar();
+    }
+
+    // Mausabbau und platzierung
+    function onMouseDown(e) {
+      if(!controls.isLocked) return;
+      const intersect = getLookingBlock();
+      if(!intersect) return;
+
+      if(e.button === 0) {
+        // Abbauen
+        const b = intersect.object;
+        const {x,y,z,type} = b.userData;
+        setBlock(x,y,z,null);
+        // Für simplicity: immer dirt ins inventory
+        inventory[selectedSlot] = type;
+        renderHotbar();
+        renderInventory();
+      }
+      if(e.button === 2) {
+        // Platzieren
+        const faceNormal = intersect.face.normal;
+        const pos = intersect.object.position.clone().addScaledVector(faceNormal, BLOCK_SIZE);
+        const x = Math.floor(pos.x / BLOCK_SIZE);
+        const y = Math.floor(pos.y / BLOCK_SIZE);
+        const z = Math.floor(pos.z / BLOCK_SIZE);
+        if(!world[`${x},${y},${z}`]) {
+          const type = inventory[selectedSlot];
+          if(type) {
+            setBlock(x,y,z,type);
+          }
+        }
+      }
+    }
+
+    // Pointer Lock starten
+    function startGame() {
+      menu.style.display = 'none';
+      inventoryDiv.style.display = 'none';
+      controls.lock();
+    }
+
+    startBtn.onclick = startGame;
+
+    // Init Three.js
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb); // Himmelblau
+
+      camera = new THREE.PerspectiveCamera(parseInt(fovSlider.value), window.innerWidth/window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 15, 30);
+
+      renderer = new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Licht
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(50, 100, 50);
+      scene.add(directionalLight);
+
+      // Controls
+      controls = new THREE.PointerLockControls(camera, document.body);
+
+      document.addEventListener('keydown', onKeyDown);
+      document.addEventListener('keyup', onKeyUp);
+      document.addEventListener('wheel', onWheel, {passive:true});
+      document.addEventListener('mousedown', onMouseDown);
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      generateWorld();
+      renderHotbar();
+      renderInventory();
+    }
+
+    // Game Loop
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if(controls.isLocked) {
+        const delta = clock.getDelta();
+        velocity.x -= velocity.x * 10.0 * delta;
+        velocity.z -= velocity.z * 10.0 * delta;
+
+        const speed = 10.0;
+        if(moveForward) velocity.z -= speed * delta;
+        if(moveBackward) velocity.z += speed * delta;
+        if(moveLeft) velocity.x -= speed * delta;
+        if(moveRight) velocity.x += speed * delta;
+
+        controls.moveRight(-velocity.x * delta);
+        controls.moveForward(-velocity.z * delta);
+      }
+
+      camera.fov = parseInt(fovSlider.value);
+      camera.updateProjectionMatrix();
+
+      renderer.render(scene, camera);
+    }
+
+    init();
+    animate();
+  </script>
 </body>
 </html>
